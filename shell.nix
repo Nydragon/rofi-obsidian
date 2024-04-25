@@ -1,7 +1,7 @@
 { pkgs ? import <nixpkgs> { } }:
 
 pkgs.mkShell {
-  packages = with pkgs; [ rustup git pkg-config rust-analyzer];
+  packages = with pkgs; [ git pkg-config ];
 
   RUST_BACKTRACE = 1;
 }

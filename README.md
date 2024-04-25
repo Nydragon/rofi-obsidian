@@ -1,0 +1,32 @@
+# rofi-obsidian
+
+This project currently has 2 main goals, integrating the opening of specific obsidian vaults directly into [rofi](https://github.com/davatorium/rofi), and circumventing a shortcoming obsidian currently has, which is being unable to select which vault to open at startup.
+
+This programs makes use of x-scheme-handler to open the program that is currently assigned to handling `obsidian://*` URIs.
+
+# Example installation
+
+1. Either add the binary to your $PATH environment variable or move it into the $XDG_CONFIG_HOME/rofi/scripts folder.
+
+2. Modify your config.rasi in the following way:
+Add `"obsidian:rofi-obsidian"` to the `modes` array and `obsidian` to `combi-modes`.
+You may circumvent step 1 and specify the entire path to the binary instead: "obsidian:/home/nico/.config/rofi/rofi-obsidian".
+
+A minimal config example could look like this:
+
+```rasi
+configuration {
+    combi-modes: ["obsidian"];
+    modes: ["obsidian:rofi-obsidian"]
+}
+```
+
+# Troubleshooting
+
+## Obsidian doesn't start
+
+Make sure that one of the following programs is installed:
+- xdg-open
+- gio
+- gnome-open
+- kde-open

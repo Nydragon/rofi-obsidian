@@ -1,6 +1,5 @@
 use serde_json;
 use std::collections::HashMap;
-use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::{env, fs};
 
@@ -22,44 +21,37 @@ fn get_known_vaults() -> Vec<String> {
 
     let flatpak_conf: String =
         format!("{user_home}/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json");
+    let default_conf: String = format!("{xdg_conf}/obsidian/obsidian.json");
 
     let buf = fs::read_to_string(flatpak_conf).unwrap();
 
     let vaults: VaultDB = serde_json::from_str(&buf).unwrap();
 
-    vaults
+    let mut vault_paths: Vec<String> = vaults
         .vaults
         .into_iter()
         .map(|(_, vault)| vault.path)
-        .collect()
+        .collect();
+    vault_paths.sort();
+    vault_paths
 }
 
 fn main() {
     let rofi_state: u8 = env::var("ROFI_RETV").unwrap().parse().unwrap();
-    let rofi_data: String = env::var("ROFI_DATA").unwrap_or_default();
+    let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
 
     match rofi_state {
         0 => {
-            let vaults = get_known_vaults();
-
-            vaults.iter().for_each(|vault| {
-                println!("{}", vault);
-                println!("\0data\x1f{}", vault);
+            get_known_vaults().iter().for_each(|vault| {
+                println!("{vault}\0info\x1f{vault}");
             });
         }
         1 => {
-            let vault = PathBuf::from(rofi_data);
-            let vault = vault.file_name().unwrap();
-            let vault = vault.to_str().unwrap();
+            let vault = PathBuf::from(rofi_info);
+            let vault = vault.file_name().unwrap().to_str().unwrap().to_string();
+            let path = format!("obsidian://open?vault={vault}");
 
-            std::process::Command::new("bash")
-                .args([
-                    "-c",
-                    &format!(
-                        "coproc (md.obsidian.Obsidian \"obsidian://open?vault={vault}\" > /dev/null 2>&1)",
-                    ),
-                ])
-                .exec();
+            open::that_detached(path).unwrap();
         }
         _ => unimplemented!(),
     };
