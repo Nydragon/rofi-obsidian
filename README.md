@@ -30,3 +30,13 @@ Make sure that one of the following programs is installed:
 - gio
 - gnome-open
 - kde-open
+
+## A different program starts when using the plugin
+
+Execute the following command (or an equivalent command to inspect mime type associations):
+
+```bash
+xdg-mime query default x-scheme-handler/obsidian
+```
+
+It should return the executable being used to start Obsidian.
