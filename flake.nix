@@ -8,6 +8,7 @@
   outputs = { self, nixpkgs, flake-utils, rust-overlay, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
         rustVersion = pkgs.rust-bin.stable.latest.default;
@@ -18,11 +19,9 @@
         };
 
         myRustBuild = rustPlatform.buildRustPackage {
-          pname =
-            "rofi-obsidian"; # make this what ever your cargo.toml package.name is
-          version = "0.1.0";
-          src = ./.; # the folder with the cargo.toml
-
+          pname = manifest.name;
+          version = manifest.version;
+          src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
         };
       in {
