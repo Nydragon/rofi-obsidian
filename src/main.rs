@@ -1,3 +1,4 @@
+use anyhow::Result;
 use serde_json;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -15,44 +16,77 @@ struct Vault {
     open: Option<bool>,
 }
 
-fn get_known_vaults() -> Vec<String> {
-    let user_home = env::var("HOME").unwrap();
-    let xdg_conf = env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| format!("{user_home}/.config"));
+fn get_vaults(path: String) -> Result<Vec<String>> {
+    let buf: String = fs::read_to_string(path)?;
+    let vaults: VaultDB = serde_json::from_str(&buf)?;
 
-    let flatpak_conf: String =
-        format!("{user_home}/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json");
-    let default_conf: String = format!("{xdg_conf}/obsidian/obsidian.json");
-
-    let buf = fs::read_to_string(flatpak_conf).unwrap();
-
-    let vaults: VaultDB = serde_json::from_str(&buf).unwrap();
-
-    let mut vault_paths: Vec<String> = vaults
+    let vault_paths: Vec<String> = vaults
         .vaults
         .into_iter()
         .map(|(_, vault)| vault.path)
         .collect();
+    Ok(vault_paths)
+}
+
+// Merge and deduplicate both the flatpak and native configuration files.
+fn merge(v1: Vec<String>, mut v2: Vec<String>) -> Vec<String> {
+    v1.iter().for_each(|i| {
+        if !v2.contains(&i) {
+            v2.push(i.to_string());
+        };
+    });
+
+    v2
+}
+
+fn get_known_vaults() -> Vec<String> {
+    let home = env::var("HOME").unwrap_or_default();
+    let xdg_conf = env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| {
+        if !home.is_empty() {
+            format!("{home}/.config")
+        } else {
+            String::default()
+        }
+    });
+
+    if home.is_empty() && xdg_conf.is_empty() {
+        return vec![];
+    }
+
+    let flatpak_conf: String =
+        format!("{home}/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json");
+    let native_conf: String = format!("{xdg_conf}/obsidian/obsidian.json");
+
+    let mut vault_paths = merge(
+        get_vaults(native_conf).unwrap_or_default(),
+        get_vaults(flatpak_conf).unwrap_or_default(),
+    );
+
     vault_paths.sort();
     vault_paths
 }
 
-fn main() {
-    let rofi_state: u8 = env::var("ROFI_RETV").unwrap().parse().unwrap();
-    let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
+fn main() -> Result<()> {
+    let rofi_state: u8 = env::var("ROFI_RETV")?.parse()?;
+    let rofi_info: String = env::var("ROFI_INFO")?;
 
     match rofi_state {
+        // Prompting which vault to open
         0 => {
             get_known_vaults().iter().for_each(|vault| {
                 println!("{vault}\0info\x1f{vault}");
             });
         }
+        // Opening the selected vault
         1 => {
             let vault = PathBuf::from(rofi_info);
-            let vault = vault.file_name().unwrap().to_str().unwrap().to_string();
+            let vault = vault.file_name().unwrap().to_string_lossy();
             let path = format!("obsidian://open?vault={vault}");
 
-            open::that_detached(path).unwrap();
+            open::that_detached(path)?;
         }
         _ => unimplemented!(),
     };
+
+    Ok(())
 }

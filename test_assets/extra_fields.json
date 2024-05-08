@@ -1,0 +1,14 @@
+{
+    "vaults": {
+        "6021CC06ADD34BC5": {
+            "path": "some-path",
+            "ts": 5217286324204,
+            "extra-field": "test"
+        },
+        "069A36D1B118C623": {
+            "path": "some-other-path",
+            "ts": 4037521157375,
+            "other-field": 3
+        }
+    }
+}

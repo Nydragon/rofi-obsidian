@@ -3,7 +3,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
-    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
   };
   outputs = { self, nixpkgs, flake-utils, rust-overlay, ... }:
     flake-utils.lib.eachDefaultSystem (system:
@@ -23,6 +22,12 @@
           version = manifest.version;
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
+
+          meta = with nixpkgs.lib; {
+            description = manifest.description;
+            license = licenses.unlicense;
+            maintainers = [ ];
+          };
         };
       in {
         packages = { rustPackage = myRustBuild; };
