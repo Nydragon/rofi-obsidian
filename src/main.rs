@@ -90,3 +90,39 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{get_vaults, merge};
+
+    #[test]
+    fn test_merge() {
+        let elem_test: String = "TEST".into();
+        let elem_foo: String = "FOO".into();
+        let elem_bar: String = "BAR".into();
+
+        let v1 = vec![elem_test.clone(), elem_foo.clone()];
+        let v2 = vec![elem_test.clone(), elem_bar.clone()];
+
+        let v3 = merge(v1, v2);
+
+        assert_eq!(v3.len(), 3);
+        assert!(v3.contains(&elem_test));
+        assert!(v3.contains(&elem_foo));
+        assert!(v3.contains(&elem_bar));
+    }
+
+    #[test]
+    fn test_base_json() {
+        let paths = get_vaults("./test_assets/base.json".into()).unwrap();
+
+        assert_eq!(paths.len(), 2);
+    }
+
+    #[test]
+    fn test_extra_fields_json() {
+        let paths = get_vaults("./test_assets/extra_fields.json".into()).unwrap();
+
+        assert_eq!(paths.len(), 2);
+    }
+}
