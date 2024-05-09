@@ -6,11 +6,19 @@ This programs makes use of x-scheme-handler to open the program that is currentl
 
 # Example installation
 
-1. Either add the binary to your $PATH environment variable or move it into the $XDG_CONFIG_HOME/rofi/scripts folder.
+## Using cargo
 
-2. Modify your config.rasi in the following way:
-   Add `"obsidian:rofi-obsidian"` to the `modes` array and `obsidian` to `combi-modes`.
-   You may circumvent step 1 and specify the entire path to the binary instead: "obsidian:/home/nico/.config/rofi/rofi-obsidian".
+Clone the repository and execute `cargo install`
+
+## Manually
+
+Either add the binary to your $PATH environment variable or move it into the $XDG_CONFIG_HOME/rofi/scripts folder.
+
+## Final Step
+
+Don't forget to modify your config.rasi in the following way:
+Add `"obsidian:rofi-obsidian"` to the `modes` array and `obsidian` to `combi-modes`.
+You may circumvent step 1 and specify the entire path to the binary instead: "obsidian:/home/nico/.config/rofi/rofi-obsidian".
 
 A minimal config example could look like this:
 
@@ -22,16 +30,6 @@ configuration {
 ```
 
 # Troubleshooting
-
-## Cannot handle different vaults having the same name
-
-This is an issue with obsidian and how they handle the `obsidian://*` URIs.
-
-Having a Vault A called "personal" and a Vault B called "personal" as well, Obsidian will always try to open A as
-this is not something specified in their URI: `obsidian://open?vault=personal&file=Welcome`. They are however both
-individually openable through the application.
-
-As workaround it would suffice to use unique names across all your Vaults.
 
 ## Obsidian doesn't start
 
