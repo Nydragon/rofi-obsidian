@@ -2,6 +2,7 @@ use anyhow::Result;
 use std::collections::HashMap;
 use std::path::Path;
 use std::{env, fs};
+use url::form_urlencoded::Serializer;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct VaultDB {
@@ -82,10 +83,11 @@ fn main() -> Result<()> {
         }
         // Opening the selected vault
         1 => {
-            let vault = PathBuf::from(rofi_info);
-            let vault = vault.file_name().unwrap().to_string_lossy();
-            let path = format!("obsidian://open?vault={vault}");
+            let path = Serializer::new(rofi_info).finish();
+            let path = format!("obsidian://open?path={path}");
 
+            #[cfg(debug_assertions)]
+            eprintln!("{path}");
             open::that_detached(path)?;
         }
         _ => unimplemented!(),
