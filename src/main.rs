@@ -1,7 +1,6 @@
 use anyhow::Result;
-use serde_json;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::Path;
 use std::{env, fs};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -68,13 +67,17 @@ fn get_known_vaults() -> Vec<String> {
 
 fn main() -> Result<()> {
     let rofi_state: u8 = env::var("ROFI_RETV")?.parse()?;
-    let rofi_info: String = env::var("ROFI_INFO")?;
+    let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
 
     match rofi_state {
         // Prompting which vault to open
         0 => {
             get_known_vaults().iter().for_each(|vault| {
-                println!("{vault}\0info\x1f{vault}");
+                let name = Path::new(vault)
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or_else(|| vault);
+                println!("{name}\0info\x1f{vault}");
             });
         }
         // Opening the selected vault

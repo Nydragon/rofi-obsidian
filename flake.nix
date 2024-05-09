@@ -35,6 +35,17 @@
         devShell = pkgs.mkShell {
           buildInputs =
             [ (rustVersion.override { extensions = [ "rust-src" ]; }) ];
+          shellHook = let
+            cargo = "${pkgs.cargo}/bin/cargo";
+            rofi = "${pkgs.rofi}/bin/rofi";
+            bin = "rofi-obsidian";
+          in ''
+            alias test-rofi="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
+            alias release-rofi="${cargo} build && ${rofi} -show o -modes o:./target/profile/${bin}"
+
+            echo "Use test-rofi to build and run the debuging version with rofi."
+            echo "Use release-rofi to build and run the release version with rofi."
+          '';
         };
       });
 
