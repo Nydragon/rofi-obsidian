@@ -39,12 +39,14 @@
             cargo = "${pkgs.cargo}/bin/cargo";
             rofi = "${pkgs.rofi}/bin/rofi";
             bin = "rofi-obsidian";
+            rofiDebug = "rest-rofi";
+            rofiRelease = "release-rofi";
           in ''
-            alias test-rofi="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
-            alias release-rofi="${cargo} build && ${rofi} -show o -modes o:./target/profile/${bin}"
+            alias ${rofiDebug}="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
+            alias ${rofiRelease}="${cargo} build && ${rofi} -show o -modes o:./target/profile/${bin}"
 
-            echo "Use test-rofi to build and run the debuging version with rofi."
-            echo "Use release-rofi to build and run the release version with rofi."
+            echo "Use ${rofiDebug} to build and run the debuging version with rofi."
+            echo "Use ${rofiRelease} to build and run the release version with rofi."
           '';
         };
       });
