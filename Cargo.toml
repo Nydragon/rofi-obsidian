@@ -3,6 +3,10 @@ name = "rofi-obsidian"
 description = "Launch your Obsidian vaults from the comfort of rofi"
 version = "0.1.0"
 edition = "2021"
+license = "unlicense"
+license-file = "LICENSE"
+readme = "README.md"
+homepage = "https://github.com/Nydragon/rofi-obsidian"
 
 [profile.release]
 opt-level = 'z'   # Optimize for size
