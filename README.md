@@ -8,6 +8,12 @@ This programs makes use of x-scheme-handler to open the program that is currentl
 
 ## Using cargo
 
+### From crates.io
+
+Execute `cargo install rofi-obsidian`
+
+### From source
+
 Clone the repository and execute `cargo install`
 
 ## Manually

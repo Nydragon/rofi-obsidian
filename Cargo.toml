@@ -1,10 +1,9 @@
 [package]
 name = "rofi-obsidian"
 description = "Launch your Obsidian vaults from the comfort of rofi"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "Unlicense"
-license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/Nydragon/rofi-obsidian"
 

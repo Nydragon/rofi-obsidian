@@ -39,11 +39,11 @@
             cargo = "${pkgs.cargo}/bin/cargo";
             rofi = "${pkgs.rofi}/bin/rofi";
             bin = "rofi-obsidian";
-            rofiDebug = "rest-rofi";
-            rofiRelease = "release-rofi";
+            rofiDebug = "rofi-obsidian-debug";
+            rofiRelease = "rofi-obsidian-release";
           in ''
             alias ${rofiDebug}="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
-            alias ${rofiRelease}="${cargo} build && ${rofi} -show o -modes o:./target/profile/${bin}"
+            alias ${rofiRelease}="${cargo} build --profile release && ${rofi} -show o -modes o:./target/release/${bin}"
 
             echo "Use ${rofiDebug} to build and run the debuging version with rofi."
             echo "Use ${rofiRelease} to build and run the release version with rofi."
