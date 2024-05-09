@@ -83,11 +83,15 @@ fn main() -> Result<()> {
         }
         // Opening the selected vault
         1 => {
-            let path = Serializer::new(rofi_info).finish();
-            let path = format!("obsidian://open?path={path}");
+            let path: String = Serializer::new(String::default())
+                .append_pair("path", &rofi_info)
+                .finish();
+            let path = path.replace("+", "%20");
 
             #[cfg(debug_assertions)]
             eprintln!("{path}");
+
+            let path = format!("obsidian://open?{path}");
 
             open::that_detached(path)?;
         }
