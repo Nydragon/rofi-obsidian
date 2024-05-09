@@ -22,8 +22,8 @@ fn get_vaults(path: String) -> Result<Vec<String>> {
 
     let vault_paths: Vec<String> = vaults
         .vaults
-        .into_iter()
-        .map(|(_, vault)| vault.path)
+        .into_values()
+        .map(|vault| vault.path)
         .collect();
     Ok(vault_paths)
 }
@@ -31,7 +31,7 @@ fn get_vaults(path: String) -> Result<Vec<String>> {
 // Merge and deduplicate both the flatpak and native configuration files.
 fn merge(v1: Vec<String>, mut v2: Vec<String>) -> Vec<String> {
     v1.iter().for_each(|i| {
-        if !v2.contains(&i) {
+        if !v2.contains(i) {
             v2.push(i.to_string());
         };
     });
@@ -88,6 +88,7 @@ fn main() -> Result<()> {
 
             #[cfg(debug_assertions)]
             eprintln!("{path}");
+
             open::that_detached(path)?;
         }
         _ => unimplemented!(),
