@@ -86,7 +86,7 @@ fn main() -> Result<()> {
             let path: String = Serializer::new(String::default())
                 .append_pair("path", &rofi_info)
                 .finish();
-            let path = path.replace("+", "%20");
+            let path = path.replace('+', "%20");
 
             #[cfg(debug_assertions)]
             eprintln!("{path}");
