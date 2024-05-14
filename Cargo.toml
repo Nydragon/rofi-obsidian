@@ -5,7 +5,7 @@ version = "0.1.1"
 edition = "2021"
 license = "Unlicense"
 readme = "README.md"
-homepage = "https://github.com/Nydragon/rofi-obsidian"
+repository = "https://github.com/Nydragon/rofi-obsidian"
 
 [profile.release]
 opt-level = 'z'   # Optimize for size
