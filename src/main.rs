@@ -66,11 +66,10 @@ fn get_known_vaults() -> Vec<String> {
     vault_paths
 }
 
-fn main() -> Result<()> {
-    let rofi_state: u8 = env::var("ROFI_RETV")?.parse()?;
+fn rofi_main(state: u8) -> Result<()> {
     let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
 
-    match rofi_state {
+    match state {
         // Prompting which vault to open
         0 => {
             get_known_vaults().iter().for_each(|vault| {
@@ -97,6 +96,18 @@ fn main() -> Result<()> {
         }
         _ => unimplemented!(),
     };
+
+    Ok(())
+}
+fn main() -> Result<()> {
+    if let Ok(state) = env::var("ROFI_RETV") {
+        rofi_main(state.parse()?)?;
+    } else {
+        println!(
+            "Error: {} cannot be run outside of rofi.",
+            env!("CARGO_BIN_NAME")
+        );
+    }
 
     Ok(())
 }
