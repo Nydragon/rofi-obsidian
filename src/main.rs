@@ -1,4 +1,5 @@
 use anyhow::Result;
+use clap::Parser;
 use std::collections::HashMap;
 use std::path::Path;
 use std::{env, fs};
@@ -99,8 +100,20 @@ fn rofi_main(state: u8) -> Result<()> {
 
     Ok(())
 }
+#[derive(Parser, Debug)]
+#[command(author, version, about)]
+struct Args {
+    #[clap(short, long)]
+    config: bool,
+}
+
 fn main() -> Result<()> {
-    if let Ok(state) = env::var("ROFI_RETV") {
+    let args = Args::parse();
+
+    if args.config {
+        // TODO: Implement configuration manipulation with a subcommand
+        unimplemented!()
+    } else if let Ok(state) = env::var("ROFI_RETV") {
         rofi_main(state.parse()?)?;
     } else {
         println!(
