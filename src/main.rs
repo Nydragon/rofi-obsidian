@@ -1,9 +1,15 @@
+use crate::config::DisplayName;
 use anyhow::Result;
+use args::{Args, SubCommand};
 use clap::Parser;
-use std::collections::HashMap;
+use config::Config;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::{env, fs};
 use url::form_urlencoded::Serializer;
+
+mod args;
+mod config;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct VaultDB {
@@ -29,18 +35,8 @@ fn get_vaults(path: String) -> Result<Vec<String>> {
     Ok(vault_paths)
 }
 
-// Merge and deduplicate both the flatpak and native configuration files.
-fn merge(v1: Vec<String>, mut v2: Vec<String>) -> Vec<String> {
-    v1.iter().for_each(|i| {
-        if !v2.contains(i) {
-            v2.push(i.to_string());
-        };
-    });
-
-    v2
-}
-
-fn get_known_vaults() -> Vec<String> {
+fn build_sources(conf: &Config) -> Vec<String> {
+    let mut sources: Vec<String> = vec![];
     let home = env::var("HOME").unwrap_or_default();
     let xdg_conf = env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| {
         if !home.is_empty() {
@@ -54,30 +50,51 @@ fn get_known_vaults() -> Vec<String> {
         return vec![];
     }
 
-    let flatpak_conf: String =
-        format!("{home}/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json");
-    let native_conf: String = format!("{xdg_conf}/obsidian/obsidian.json");
+    if conf.source.flatpak {
+        sources.push(format!(
+            "{home}/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json"
+        ));
+    };
 
-    let mut vault_paths = merge(
-        get_vaults(native_conf).unwrap_or_default(),
-        get_vaults(flatpak_conf).unwrap_or_default(),
-    );
+    if conf.source.native {
+        sources.push(format!("{xdg_conf}/obsidian/obsidian.json"));
+    };
 
-    vault_paths.sort();
-    vault_paths
+    sources.append(&mut conf.source.additional_sources.clone());
+
+    sources
 }
 
-fn rofi_main(state: u8) -> Result<()> {
+fn get_known_vaults(conf: &Config) -> Vec<String> {
+    let sources = build_sources(conf);
+
+    let mut vaults = sources
+        .iter()
+        .flat_map(|path| get_vaults(path.to_string()).unwrap_or_default())
+        .collect::<HashSet<String>>()
+        .into_iter()
+        .map(|s| s.to_owned())
+        .collect::<Vec<String>>();
+
+    vaults.sort();
+    vaults
+}
+
+fn rofi_main(state: u8, conf: Config, _args: Args) -> Result<()> {
     let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
 
     match state {
         // Prompting which vault to open
         0 => {
-            get_known_vaults().iter().for_each(|vault| {
-                let name = Path::new(vault)
-                    .file_stem()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or_else(|| vault);
+            get_known_vaults(&conf).iter().for_each(|vault| {
+                let name = match conf.display_name {
+                    DisplayName::VaultName => Path::new(vault)
+                        .file_stem()
+                        .and_then(|s| s.to_str())
+                        .unwrap_or_else(|| vault),
+                    DisplayName::Path => vault,
+                };
+
                 println!("{name}\0info\x1f{vault}");
             });
         }
@@ -85,8 +102,8 @@ fn rofi_main(state: u8) -> Result<()> {
         1 => {
             let path: String = Serializer::new(String::default())
                 .append_pair("path", &rofi_info)
-                .finish();
-            let path = path.replace('+', "%20");
+                .finish()
+                .replace('+', "%20");
 
             #[cfg(debug_assertions)]
             eprintln!("{path}");
@@ -100,26 +117,30 @@ fn rofi_main(state: u8) -> Result<()> {
 
     Ok(())
 }
-#[derive(Parser, Debug)]
-#[command(author, version, about)]
-struct Args {
-    #[clap(short, long)]
-    config: bool,
-}
 
 fn main() -> Result<()> {
+    let conf = config::Config::parse();
     let args = Args::parse();
 
-    if args.config {
-        // TODO: Implement configuration manipulation with a subcommand
-        unimplemented!()
-    } else if let Ok(state) = env::var("ROFI_RETV") {
-        rofi_main(state.parse()?)?;
-    } else {
-        println!(
-            "Error: {} cannot be run outside of rofi.",
-            env!("CARGO_BIN_NAME")
-        );
+    match args.sub {
+        Some(SubCommand::InitConfig) => {
+            let location = conf.write()?;
+            println!("Config written to: {:?}", location);
+        }
+        Some(SubCommand::Config) => {
+            unimplemented!()
+        }
+        Some(SubCommand::Run) | None => {
+            if let Ok(state) = env::var("ROFI_RETV") {
+                let state = state.parse()?;
+                rofi_main(state, conf, args)?;
+            } else {
+                println!(
+                    "Error: {} cannot be run outside of rofi.",
+                    env!("CARGO_BIN_NAME")
+                );
+            }
+        }
     }
 
     Ok(())
@@ -127,24 +148,7 @@ fn main() -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{get_vaults, merge};
-
-    #[test]
-    fn test_merge() {
-        let elem_test: String = "TEST".into();
-        let elem_foo: String = "FOO".into();
-        let elem_bar: String = "BAR".into();
-
-        let v1 = vec![elem_test.clone(), elem_foo.clone()];
-        let v2 = vec![elem_test.clone(), elem_bar.clone()];
-
-        let v3 = merge(v1, v2);
-
-        assert_eq!(v3.len(), 3);
-        assert!(v3.contains(&elem_test));
-        assert!(v3.contains(&elem_foo));
-        assert!(v3.contains(&elem_bar));
-    }
+    use crate::get_vaults;
 
     #[test]
     fn test_base_json() {
