@@ -122,15 +122,15 @@ fn main() -> Result<()> {
     let conf = config::Config::parse();
     let args = Args::parse();
 
-    match args.sub {
-        Some(SubCommand::InitConfig) => {
+    match args.command {
+        SubCommand::InitConfig => {
             let location = conf.write()?;
             println!("Config written to: {:?}", location);
         }
-        Some(SubCommand::Config) => {
+        SubCommand::Config => {
             unimplemented!()
         }
-        Some(SubCommand::Run) | None => {
+        SubCommand::Run => {
             if let Ok(state) = env::var("ROFI_RETV") {
                 let state = state.parse()?;
                 rofi_main(state, conf, args)?;
