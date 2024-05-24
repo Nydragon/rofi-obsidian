@@ -46,6 +46,7 @@
           buildInputs = [
             (rustVersion.override { extensions = [ "rust-src" ]; })
             pkgs.git-cliff
+            pkgs.committed
           ];
           shellHook =
             let
@@ -61,6 +62,8 @@
 
               echo "Use ${rofiDebug} to build and run the debuging version with rofi."
               echo "Use ${rofiRelease} to build and run the release version with rofi."
+
+              ${pkgs.pre-commit}/bin/pre-commit install -f
             '';
         };
       }
