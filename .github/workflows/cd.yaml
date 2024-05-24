@@ -25,12 +25,12 @@ jobs:
         uses: orhun/git-cliff-action@v3
         with:
           config: cliff.toml
-          args: -l --strip header
+          args: --current -vv --strip header
         env:
-          OUTPUT: ${{ github.workspace }}-CHANGELOG.txt
+          OUTPUT: BODY.md
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
-          files: ./target/release/rofi-obsidian
-          body_path: ${{ github.workspace }}-CHANGELOG.txt
+          artifacts: ./target/release/rofi-obsidian
+          body_path: BODY.md
