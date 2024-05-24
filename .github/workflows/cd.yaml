@@ -33,4 +33,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: ./target/release/rofi-obsidian
-          body_path: BODY.md
+          bodyFile: BODY.md
