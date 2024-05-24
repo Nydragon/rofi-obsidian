@@ -25,7 +25,7 @@ jobs:
         uses: orhun/git-cliff-action@v3
         with:
           config: cliff.toml
-          args: --current -vv --strip header
+          args: --latest -vv --strip header
         env:
           OUTPUT: BODY.md
 
@@ -34,3 +34,4 @@ jobs:
         with:
           artifacts: ./target/release/rofi-obsidian
           bodyFile: BODY.md
+          allowUpdates: true
