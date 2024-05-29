@@ -2,6 +2,8 @@ use std::fmt::Display;
 
 use clap::{Parser, ValueEnum};
 
+use crate::config::DisplayName;
+
 #[derive(Debug, Clone, Default, ValueEnum)]
 pub enum SubCommand {
     /// Initiate the configuration at the default location
@@ -32,4 +34,6 @@ pub struct Args {
     pub command: SubCommand,
     #[clap()]
     pub selection: Option<String>,
+    #[clap(short, long, help = "The style of the vault name")]
+    pub name: Option<DisplayName>,
 }
