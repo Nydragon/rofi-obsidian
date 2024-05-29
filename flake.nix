@@ -47,6 +47,8 @@
             (rustVersion.override { extensions = [ "rust-src" ]; })
             pkgs.git-cliff
             pkgs.committed
+            pkgs.pre-commit
+            pkgs.typos
           ];
           shellHook =
             let
@@ -60,7 +62,7 @@
               alias ${rofiDebug}="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
               alias ${rofiRelease}="${cargo} build --profile release && ${rofi} -show o -modes o:./target/release/${bin}"
 
-              echo "Use ${rofiDebug} to build and run the debuging version with rofi."
+              echo "Use ${rofiDebug} to build and run the debugging version with rofi."
               echo "Use ${rofiRelease} to build and run the release version with rofi."
 
               ${pkgs.pre-commit}/bin/pre-commit install -f
