@@ -1,16 +1,18 @@
 use anyhow::Result;
+use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, create_dir_all, write},
     path::PathBuf,
 };
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, ValueEnum, Default, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DisplayName {
     #[default]
     VaultName,
     Path,
+    Unique,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

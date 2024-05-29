@@ -3,13 +3,16 @@ use anyhow::Result;
 use args::{Args, SubCommand};
 use clap::Parser;
 use config::Config;
+use display_name::make_unique;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
 use std::path::Path;
 use std::{env, fs};
 use url::form_urlencoded::Serializer;
 
 mod args;
 mod config;
+mod display_name;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct VaultDB {
@@ -66,9 +69,7 @@ fn build_sources(conf: &Config) -> Vec<String> {
 }
 
 fn get_known_vaults(conf: &Config) -> Vec<String> {
-    let sources = build_sources(conf);
-
-    let mut vaults = sources
+    let mut vaults = build_sources(conf)
         .iter()
         .flat_map(|path| get_vaults(path.to_string()).unwrap_or_default())
         .collect::<HashSet<String>>()
@@ -80,19 +81,30 @@ fn get_known_vaults(conf: &Config) -> Vec<String> {
     vaults
 }
 
-fn rofi_main(state: u8, conf: Config, _args: Args) -> Result<()> {
+fn rofi_main(state: u8, conf: Config, args: Args) -> Result<()> {
     let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
+    let name_style = args.name.unwrap_or(conf.display_name.clone());
 
     match state {
         // Prompting which vault to open
         0 => {
-            get_known_vaults(&conf).iter().for_each(|vault| {
-                let name = match conf.display_name {
+            let vaults = get_known_vaults(&conf);
+            // TODO: Lazy evaluation would be cooler: https://github.com/rust-lang/rust/issues/109736
+            let unique_names: Vec<String> = if name_style == DisplayName::Unique {
+                make_unique(vaults.clone())
+            } else {
+                vec![]
+            };
+
+            vaults.iter().enumerate().for_each(|(i, vault)| {
+                let name = match name_style {
                     DisplayName::VaultName => Path::new(vault)
                         .file_stem()
                         .and_then(|s| s.to_str())
                         .unwrap_or_else(|| vault),
                     DisplayName::Path => vault,
+                    //DisplayName::Unique => unique_names.get(i).unwrap_or(vault),
+                    DisplayName::Unique => unique_names.get(i).unwrap(),
                 };
 
                 println!("{name}\0info\x1f{vault}");
@@ -152,14 +164,14 @@ mod tests {
 
     #[test]
     fn test_base_json() {
-        let paths = get_vaults("./test_assets/base.json".into()).unwrap();
+        let paths = get_vaults("./test_assets/base.json".to_string()).unwrap();
 
         assert_eq!(paths.len(), 2);
     }
 
     #[test]
     fn test_extra_fields_json() {
-        let paths = get_vaults("./test_assets/extra_fields.json".into()).unwrap();
+        let paths = get_vaults("./test_assets/extra_fields.json".to_string()).unwrap();
 
         assert_eq!(paths.len(), 2);
     }
