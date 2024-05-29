@@ -7,6 +7,7 @@ repos:
     rev: v8.18.2
     hooks:
       - id: gitleaks
+        stages: [commit]
 
   - repo: local
     hooks:
@@ -18,20 +19,17 @@ repos:
         args: [--fixup, --wip, --commit-file]
         stages: [commit-msg]
 
-      - id: fmt
-        name: Lint Check
-        entry: cargo
+      - id: typos
+        name: Check for typos
+        entry: typos
         language: system
         files: .*
-        args: [fmt, --check]
-        pass_filenames: false
         stages: [commit]
 
+  - repo: https://github.com/FeryET/pre-commit-rust
+    rev: v1.1.0
+    hooks:
+      - id: fmt
+        stages: [commit]
       - id: clippy
-        name: Check clippy suggestions
-        entry: cargo
-        language: system
-        files: .*
-        args: [clippy]
-        pass_filenames: false
         stages: [commit]

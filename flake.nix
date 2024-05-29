@@ -24,7 +24,7 @@
           rustc = rustVersion;
         };
 
-        myRustBuild = rustPlatform.buildRustPackage {
+        rofi-obsidian-pkg = rustPlatform.buildRustPackage {
           pname = manifest.name;
           version = manifest.version;
           src = ./.;
@@ -38,15 +38,18 @@
         };
       in
       {
-        packages = {
-          rustPackage = myRustBuild;
+        packages = rec {
+          rofi-obsidian = rofi-obsidian-pkg;
+          default = rofi-obsidian;
         };
-        defaultPackage = myRustBuild;
-        devShell = pkgs.mkShell {
+
+        devShells.default = pkgs.mkShell {
           buildInputs = [
             (rustVersion.override { extensions = [ "rust-src" ]; })
             pkgs.git-cliff
             pkgs.committed
+            pkgs.pre-commit
+            pkgs.typos
           ];
           shellHook =
             let
@@ -55,15 +58,18 @@
               bin = "rofi-obsidian";
               rofiDebug = "rofi-obsidian-debug";
               rofiRelease = "rofi-obsidian-release";
+              RED = "\\033[0;31m";
+              NC = "\\033[0m";
             in
             ''
               alias ${rofiDebug}="${cargo} build && ${rofi} -show o -modes o:./target/debug/${bin}"
               alias ${rofiRelease}="${cargo} build --profile release && ${rofi} -show o -modes o:./target/release/${bin}"
-
-              echo "Use ${rofiDebug} to build and run the debuging version with rofi."
-              echo "Use ${rofiRelease} to build and run the release version with rofi."
-
               ${pkgs.pre-commit}/bin/pre-commit install -f
+
+              printf "\n${RED}INFO -----------${NC}\n\n";
+              echo "Use ${rofiDebug} to build and run the debugging version with rofi."
+              echo "Use ${rofiRelease} to build and run the release version with rofi."
+              printf "\n${RED}INFO -----------${NC}\n\n";
             '';
         };
       }
