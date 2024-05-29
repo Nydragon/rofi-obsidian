@@ -6,17 +6,23 @@ This programs makes use of x-scheme-handler to open the program that is currentl
 
 # Example installation
 
-## Using cargo
+### Using cargo
 
-### From crates.io
+#### From crates.io
 
 Execute `cargo install rofi-obsidian`
 
-### From source
+#### From source
 
 Clone the repository and execute `cargo install`
 
-## Manually
+### Using Nix Flakes
+
+```sh
+nix profile install github:Nydragon/rofi-obsidian
+```
+
+### Manually
 
 Either add the binary to your $PATH environment variable or move it into the $XDG_CONFIG_HOME/rofi/scripts folder.
 
