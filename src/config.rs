@@ -19,6 +19,8 @@ pub enum DisplayName {
 pub struct Config {
     pub display_name: DisplayName,
     pub source: Source,
+    #[serde(default = "default_icon")]
+    pub icon: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -48,6 +50,10 @@ impl Config {
         write(path.clone(), toml::to_string(self)?)?;
         Ok(path)
     }
+}
+
+fn default_icon() -> String {
+    "obsidian".to_string()
 }
 
 impl Default for Source {

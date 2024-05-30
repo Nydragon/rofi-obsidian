@@ -36,4 +36,6 @@ pub struct Args {
     pub selection: Option<String>,
     #[clap(short, long, help = "The style of the vault name")]
     pub name: Option<DisplayName>,
+    #[clap(short, long, help = "The icon to display for each entry")]
+    pub icon: Option<String>,
 }
