@@ -33,7 +33,15 @@ Clone the repository and execute:
 cargo install
 ```
 
-### Using Nix Flakes
+### Using Nix
+
+#### Nixpkgs
+
+```sh
+nix profile install nixpkgs#rofi-obsidian
+```
+
+#### Latest changes
 
 ```sh
 nix profile install github:Nydragon/rofi-obsidian
