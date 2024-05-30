@@ -1,5 +1,14 @@
 # rofi-obsidian
 
+<div align="center">
+
+![Crates.io Version](https://img.shields.io/crates/v/rofi-obsidian?style=flat-square&logo=rust)
+![Nixpkgs-unstable Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.nixhub.io%2Fpackages%2Frofi-obsidian%3F_data%3Droutes%252F_nixhub.packages.%2524pkg._index&query=%24.releases.0.version&prefix=v&style=flat-square&logo=nixos&logoColor=fff&label=nixpkgs-version)
+![GitHub Release Date](https://img.shields.io/github/release-date/Nydragon/rofi-obsidian?style=flat-square&logo=github)
+![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/Nydragon/rofi-obsidian/latest?style=flat-square&logo=github)
+
+</div>
+
 This project currently has 2 main goals, integrating the opening of specific obsidian vaults directly into [rofi](https://github.com/davatorium/rofi), and circumventing a shortcoming obsidian currently has, which is being unable to select which vault to open at startup.
 
 This programs makes use of x-scheme-handler to open the program that is currently assigned to handling `obsidian://*` URIs.
@@ -10,13 +19,29 @@ This programs makes use of x-scheme-handler to open the program that is currentl
 
 #### From crates.io
 
-Execute `cargo install rofi-obsidian`
+Execute:
+
+```sh
+cargo install rofi-obsidian
+```
 
 #### From source
 
-Clone the repository and execute `cargo install`
+Clone the repository and execute:
 
-### Using Nix Flakes
+```sh
+cargo install
+```
+
+### Using Nix
+
+#### Nixpkgs
+
+```sh
+nix profile install nixpkgs#rofi-obsidian
+```
+
+#### Latest changes
 
 ```sh
 nix profile install github:Nydragon/rofi-obsidian
