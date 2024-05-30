@@ -84,6 +84,7 @@ fn get_known_vaults(conf: &Config) -> Vec<String> {
 fn rofi_main(state: u8, conf: Config, args: Args) -> Result<()> {
     let rofi_info: String = env::var("ROFI_INFO").unwrap_or_default();
     let name_style = args.name.unwrap_or(conf.display_name.clone());
+    let icon = args.icon.unwrap_or(conf.icon.clone());
 
     match state {
         // Prompting which vault to open
@@ -107,7 +108,7 @@ fn rofi_main(state: u8, conf: Config, args: Args) -> Result<()> {
                     DisplayName::Unique => unique_names.get(i).unwrap(),
                 };
 
-                println!("{name}\0info\x1f{vault}");
+                println!("{name}\0icon\x1f{icon}\x1finfo\x1f{vault}");
             });
         }
         // Opening the selected vault
