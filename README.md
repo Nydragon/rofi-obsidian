@@ -2,8 +2,8 @@
 
 <div align="center">
 
-![Crates.io Version](https://img.shields.io/crates/v/rofi-obsidian?style=flat-square&logo=rust)
-![Nixpkgs-unstable Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.nixhub.io%2Fpackages%2Frofi-obsidian%3F_data%3Droutes%252F_nixhub.packages.%2524pkg._index&query=%24.releases.0.version&prefix=v&style=flat-square&logo=nixos&logoColor=fff&label=nixpkgs-version)
+[![Crates.io Version](https://img.shields.io/crates/v/rofi-obsidian?style=flat-square&logo=rust)](https://crates.io/crates/rofi-obsidian)
+[![Nixpkgs-unstable Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.nixhub.io%2Fpackages%2Frofi-obsidian%3F_data%3Droutes%252F_nixhub.packages.%2524pkg._index&query=%24.releases.0.version&prefix=v&style=flat-square&logo=nixos&logoColor=fff&label=nixpkgs-version)](https://search.nixos.org/packages?channel=unstable&show=rofi-obsidian)
 ![GitHub Release Date](https://img.shields.io/github/release-date/Nydragon/rofi-obsidian?style=flat-square&logo=github)
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/Nydragon/rofi-obsidian/latest?style=flat-square&logo=github)
 
